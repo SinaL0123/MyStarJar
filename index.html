@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Star Jar · Emotional Value & Experiential Spending</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <header class="site-head">
+    <div class="actions">
+      <button id="musicBtn" class="btn ghost" aria-label="Toggle background music" title="Toggle background music">♪</button>
+      <button id="pourBtn" class="btn">Shake & Pour</button>
+      <button id="addBtn" class="btn accent" aria-label="Add a star">＋</button>
+      <button id="exportBtn" class="btn ghost">Export JSON</button>
+      <button id="clearBtn" class="btn ghost">Clear All</button>
+    </div>
+  </header>
+  
+  <!-- Background music -->
+  <audio id="bgMusic" loop preload="auto">
+    <source src="wind.mp3" type="audio/mpeg">
+  </audio>
+
+  <main class="wrap single">
+    <!-- Bottle only -->
+    <section class="jar-card">
+      <div class="jar-header">
+        <h2 class="jar-title">My Star Jar</h2>
+        <p class="jar-intro">This is your special star jar, a place to treasure your unforgettable memories and meaningful experiences.</p>
+      </div>
+      <div class="jar">
+        <div class="bottle"></div>
+        <div id="stars" class="stars" aria-live="polite"></div>
+      </div>
+      <div class="legend broider">
+        <span class="lg">Size = Spending</span>
+        <span><i class="dot cat-concert"></i>Concert</span>
+        <span><i class="dot cat-travel"></i>Travel</span>
+        <span><i class="dot cat-dining"></i>Dining</span>
+        <span><i class="dot cat-learning"></i>Learning</span>
+        <span><i class="dot cat-wellness"></i>Wellness</span>
+        <span class="lg">blur: Unplanned</span>
+        <span id="countTip" class="sub" style="margin-left:auto">0 stars</span>
+      </div>
+    </section>
+  </main>
+
+  <!-- Add Form Modal (click + to open) -->
+  <div id="addModal" class="modal" role="dialog" aria-modal="true">
+    <div class="card add-card">
+      <div class="row between">
+        <h2 class="card-title">Add a New Star</h2>
+        <button id="closeAdd" class="btn xs">×</button>
+      </div>
+      <form id="form" class="grid">
+        <div class="grid two">
+          <div>
+            <label>Title (optional)</label>
+            <input type="text" name="title" placeholder="YOASOBI Concert / Hot Spring Trip" />
+          </div>
+          <div>
+            <label>Date (Experience Date)</label>
+            <input type="date" name="date" required />
+          </div>
+        </div>
+
+        <div class="grid two">
+          <div>
+            <label>Amount *</label>
+            <input type="number" name="amount" min="0" step="0.01" placeholder="120" required />
+          </div>
+          <div>
+            <label>Currency *</label>
+            <select name="currency" required>
+              <option value="USD">USD</option>
+              <option value="JPY">JPY</option>
+              <option value="CNY">CNY</option>
+              <option value="EUR">EUR</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="grid two">
+          <div>
+            <label>Category *</label>
+            <select name="category" required>
+              <option value="concert">Concert</option>
+              <option value="travel">Travel</option>
+              <option value="dining">Dining</option>
+              <option value="learning">Learning</option>
+              <option value="wellness">Wellness</option>
+            </select>
+          </div>
+          <div class="inline">
+            <label class="checkbox">
+              <input type="checkbox" name="planned" />
+              <span>Planned (within Joy Budget)</span>
+            </label>
+          </div>
+        </div>
+
+        <div class="grid two">
+          <div>
+            <label>Mood Before（1–5）</label>
+            <input type="number" name="mood_pre" min="1" max="5" value="3" />
+          </div>
+          <div>
+            <label>Guilt Baseline（0–5）</label>
+            <input type="number" name="guilt_pre" min="0" max="5" value="2" />
+          </div>
+        </div>
+
+        <div>
+          <label>Intent（Your Expectation？）</label>
+          <input type="text" name="intent_pre" placeholder="Relax / Connect with friends / Learn something new…" />
+        </div>
+
+        <div>
+          <label>Media URL（Optional, image/video/link）</label>
+            <input type="url" name="mediaUrl" placeholder="https://…/photo.jpg or https://youtu.be/…" />
+        </div>
+
+        <div>
+          <label>Note（Short note about the experience）</label>
+          <textarea name="text" placeholder="One sentence: the happiest moment / why it's worth it"></textarea>
+        </div>
+
+        <div class="row end">
+          <button type="button" id="cancelAdd" class="btn">Cancel</button>
+          <button type="submit" class="btn accent">Put in the jar</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- View details Memo Modal -->
+  <div id="modal" class="modal" role="dialog" aria-modal="true">
+    <div class="memo">
+      <div class="memo-pin" aria-hidden="true"></div>
+      <div class="memo-paper">
+        <div class="memo-head">
+          <div class="memo-title" id="mTitle">—</div>
+          <button id="closeModal" class="btn xs">×</button>
+        </div>
+
+        <div class="memo-meta" id="mMeta"></div>
+
+        <div id="mMedia" class="memo-media" hidden></div>
+        <div id="mText" class="memo-text"></div>
+
+        <div class="memo-section">
+          <div class="memo-subtitle">After check-in（After experience, score）</div>
+          <form id="afterForm" class="grid two">
+            <div>
+              <label>Mood After（1–5）</label>
+              <input id="mood_post" type="number" min="1" max="5" />
+            </div>
+            <div>
+              <label>Guilt After（0–5）</label>
+              <input id="guilt_post" type="number" min="0" max="5" />
+            </div>
+          </form>
+          <div id="mROI" class="memo-roi"></div>
+        </div>
+
+        <div class="memo-actions">
+          <button id="saveAfter" type="button" class="btn accent">Save After</button>
+          <button id="putBackBtn" type="button" class="btn">Put back the jar</button>
+          <button id="deleteBtn" class="btn ghost">Delete</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Folding Animation Overlay -->
+  <div id="foldingAnimation" class="folding-animation">
+    <div class="folding-image"></div>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>
