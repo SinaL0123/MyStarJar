@@ -118,7 +118,7 @@ function playFoldingAnimation(callback) {
       if (callback) callback();
       return;
     }
-    const imageUrl = `${currentFrame}.png`;
+    const imageUrl = `foldsteps/${currentFrame}.png`;
     foldingImage.style.backgroundImage = `url('${imageUrl}')`;
     setTimeout(showFrame, frameDuration);
   }
@@ -430,8 +430,8 @@ function findDropPosition(newStarAmount = 100, newStarCurrency = 'USD'){
   
   function xRangeAtY(y, containerW, containerH, padding, starSize){
     let minBase = 20, maxBase = 80;
-    if (y < 12){ minBase = 48; maxBase = 52; }
-    else if (y < 18){ minBase = 45; maxBase = 55; }
+    if (y < 12){ minBase = 30; maxBase = 70; }
+    else if (y < 18){ minBase = 28; maxBase = 72; }
     else if (y < 25){ minBase = 35; maxBase = 65; }
     else if (y < 35){ minBase = 28; maxBase = 72; }
     else if (y < 50){ minBase = 24; maxBase = 76; }
